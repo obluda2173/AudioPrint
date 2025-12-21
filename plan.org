@@ -57,3 +57,5 @@ We need two tables. Simplicity is key here; speed comes from indexing the =hash=
 - [[https://www.ee.columbia.edu/~dpwe/papers/Wang03-shazam.pdf][The Bible of Audio Fingerprint]]
 - [[https://github.com/mdeff/fma?tab=readme-ov-file][Archive with datasets]]
 -
+
+Wow Erik crazy
