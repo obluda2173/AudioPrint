@@ -2,7 +2,7 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-21>
-#+lastmod: <2025-12-21 16:46>
+#+lastmod: <2025-12-21 18:01>
 #+options: num:t
 #+startup: overview
 
@@ -50,6 +50,16 @@ We need two tables. Simplicity is key here; speed comes from indexing the =hash=
   - =song_id= (Integer): Foreign key to the =songs= table.
 
   - =offset= (Integer): The time (in milliseconds or window index) where this hash appeared in the song.
+
+* Q&A
+
+- *What is a spectrogram?*
+
+  A spectogram is a visual graph showing a signal's frequency changes over time, mapping *time* (horizontal axis), *frequency* (vertical axis), and *amplitude/intensity* (color/brightness) all in one image, allowing you to /"see"/ sound or other signals by revealing how their frequency content evolves.
+
+  Example:
+  [[file:media/spectrogram_example.png][spectrogram_example.png]]
+
 
 
 * Resources
