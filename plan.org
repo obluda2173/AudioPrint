@@ -2,7 +2,7 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-21>
-#+lastmod: <2025-12-21 19:07>
+#+lastmod: <2025-12-21 19:14>
 #+options: num:t
 #+startup: overview
 
@@ -20,17 +20,16 @@ AudioPrint/
 │   ├── db/                  # SQLite database file location
 │   └── songs/               # Raw MP3 files for testing
 ├── tests/                   # Unit tests
-├── requirements.org         # Dependencies (numpy, scipy, librosa, pyaudio)
-├── manage.py                # CLI tool (e.g., "python manage.jl add song.mp3")
+├── requirements.org         # Dependencies
+├── manage.py                # CLI tool
 └── README.md
 #+end_src
 
 * Detailed Structure
 
-- *Module 1: dso.jl* (the ears)
+- *Module 1: dsp.jl* (the ears)
 
   *Responsibility*: Convert the .mp3 files to 2D array (spectogram)
-
 
 - *Module 2: fingerprint.jl* (the brain)
 
@@ -62,7 +61,6 @@ The system should have two distinct workflows:
 - Fingerprinting (Enrollment) and
 - Recognition (Querying)
 
-
 * The Database Schema
 We need two tables. Simplicity is key here; speed comes from indexing the =hash=.
 
@@ -90,8 +88,6 @@ We need two tables. Simplicity is key here; speed comes from indexing the =hash=
 
   Example:
   [[file:media/spectrogram_example.png][spectrogram_example.png]]
-
-
 
 * Resources
 
