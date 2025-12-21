@@ -1,0 +1,59 @@
+#+title: Plan
+#+author: Erik An
+#+email: obluda2173@gmail.com
+#+date: <2025-12-21>
+#+lastmod: <2025-12-21 16:46>
+#+options: num:t
+#+startup: overview
+
+* General Structure
+
+#+begin_src
+AudioPrint/
+├── src/                     # Main Source Code Package
+│   ├── __init__.jl
+│   ├── dsp.jl               # Signal processing (FFT, Spectrograms)
+│   ├── fingerprint.jl       # Logic to find peaks and generate hashes
+│   ├── database.jl          # SQL interactions (insert/query hashes)
+│   └── recognize.jl         # The "Controller" that ties it all together
+├── data/
+│   ├── db/                  # SQLite database file location
+│   └── songs/               # Raw MP3 files for testing
+├── tests/                   # Unit tests
+├── requirements.org         # Dependencies (numpy, scipy, librosa, pyaudio)
+├── manage.py                # CLI tool (e.g., "python manage.jl add song.mp3")
+└── README.md
+#+end_src
+
+* High-Level Architecture
+
+The system should have two distinct workflows:
+- Fingerprinting (Enrollment) and
+- Recognition (Querying)
+
+
+* The Database Schema
+We need two tables. Simplicity is key here; speed comes from indexing the =hash=.
+
+- =songs= Table:
+
+  - =id= (Integer, Primary Key)
+
+  - =name= (String)
+
+  - =artist= (String, optional)
+
+- =fingerprints= Table:
+
+  - =hash= (String/Binary): The generated unique ID for a specific constellation of frequencies. (Index this column!)
+
+  - =song_id= (Integer): Foreign key to the =songs= table.
+
+  - =offset= (Integer): The time (in milliseconds or window index) where this hash appeared in the song.
+
+
+* Resources
+
+- [[https://www.ee.columbia.edu/~dpwe/papers/Wang03-shazam.pdf][The Bible of Audio Fingerprint]]
+- [[https://github.com/mdeff/fma?tab=readme-ov-file][Archive with datasets]]
+-
