@@ -2,7 +2,7 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-21>
-#+lastmod: <2025-12-21 19:16>
+#+lastmod: <2025-12-21 19:53>
 #+options: num:t
 #+startup: overview
 
@@ -30,6 +30,24 @@ AudioPrint/
 - *Module 1: dsp.jl* (the ears)
 
   *Responsibility*: Convert the .mp3 files to 2D array (spectrogram)
+
+  *API*: Function should return the Matrix{Float64} in which:
+
+  - *Y-Axis*: Frequency Bins (Low pitch to High pitch)
+  - *X-Axis*: Time Frames (From Start of song to end)
+  - *Value*: =A[i,j]= The Volume (Amplitude/Magnitude) of that specific frequency at that specific time.
+
+    |---------------+--------+---------------+--------+-----|
+    | Indices       | Time 1 | Time 2 (10ms) | Time 3 | ... |
+    |---------------+--------+---------------+--------+-----|
+    | Freq 1 (0Hz)  |   0.01 | 0.02          |   0.01 | ... |
+    |---------------+--------+---------------+--------+-----|
+    | Freq 2 (43Hz) |   0.05 | 0.99 (PEAK)   |   0.12 | ... |
+    |---------------+--------+---------------+--------+-----|
+    | Freq 3 (86Hz) |   0.02 | 0.15          |   0.02 | ... |
+    |---------------+--------+---------------+--------+-----|
+    | ...           |    ... | ...           |    ... | ... |
+    |---------------+--------+---------------+--------+-----|
 
 - *Module 2: fingerprint.jl* (the brain)
 
