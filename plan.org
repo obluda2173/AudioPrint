@@ -2,7 +2,7 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-21>
-#+lastmod: <2025-12-21 19:53>
+#+lastmod: <2025-12-21 19:57>
 #+options: num:t
 #+startup: overview
 
@@ -49,6 +49,7 @@ AudioPrint/
     | ...           |    ... | ...           |    ... | ... |
     |---------------+--------+---------------+--------+-----|
 
+
 - *Module 2: fingerprint.jl* (the brain)
 
   *Responsibility*: Find "peaks" in the spectrogram and turn them into hashes.
@@ -62,6 +63,7 @@ AudioPrint/
      - Take an "Anchor Point" (A).
      - Find the "Target Point" (B) nearby in time.
      - Create a signature: =Hash = (Frequency_A) + (Frequency_B) + (Time_Delta)=.
+
 
 - *Module 3: recognize.jl* (The Matcher)
 
