@@ -2,7 +2,7 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-21>
-#+lastmod: <2025-12-21 19:57>
+#+lastmod: <2025-12-24 18:50>
 #+options: num:t
 #+startup: overview
 
@@ -31,7 +31,7 @@ AudioPrint/
 
   *Responsibility*: Convert the .mp3 files to 2D array (spectrogram)
 
-  *API*: Function should return the Matrix{Float64} in which:
+  *API*: Function should return the Matrix{Float32} in which:
 
   - *Y-Axis*: Frequency Bins (Low pitch to High pitch)
   - *X-Axis*: Time Frames (From Start of song to end)
