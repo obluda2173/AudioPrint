@@ -7,12 +7,9 @@ using .Dsp
 const SONG_PATH = "./data/fma_small_local/000/000002.wav"
 
 function main()
-    spec = spectrogram_cstm(SONG_PATH)
-    println("Spectrogram created: ", length(spec))
-    peaks = find_peaks(spec)
-    println("Peaks found: ", length(peaks))
+    spec_matrix = compute_log_spectrogram(SONG_PATH)
+    peaks = find_peaks(spec_matrix)
     results = hash_peaks(peaks)
-    println("Hashes generated: ", length(results))
 
     open("hash.txt", "w") do io
         for res in results
