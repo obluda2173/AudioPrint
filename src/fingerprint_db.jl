@@ -3,11 +3,10 @@ using DataFrames
 
 db = SQLite.DB("../db/songs.db")
 
-SQLite.execute(db, """
-DROP TABLE IF EXISTS Songs;
-DROP TABLE IF EXISTS Fingerprints;
-""")
-
+# SQLite.execute(db, """
+# DROP TABLE IF EXISTS Songs;
+# DROP TABLE IF EXISTS Fingerprints;
+# """)
 
 SQLite.execute(db, """
 CREATE TABLE IF NOT EXISTS Songs (
@@ -27,5 +26,3 @@ CREATE TABLE IF NOT EXISTS Fingerprints (
 """)
 
 SQLite.execute(db, "CREATE INDEX IF NOT EXISTS idx_hash ON Fingerprints (hash)")
-
-SQLite.tables(db)
