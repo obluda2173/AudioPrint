@@ -2,7 +2,51 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-24>
-#+lastmod: <2025-12-24 18:50>
+#+lastmod: <2025-12-25 14:54>
 #+options: num:t
 #+startup: overview
 
+* General
+What is hashing and why do we need it for music recognition?
+
+- Hashing :: The process of converting an input of any size (like text, a file, or data) into a fixed-size string of characters or value, called a *hash* or *digest*, using a mathematical function.
+
+Hashing is a versatile tool used in multiple fields:
+- *Data Structures*: Quickly finding data in hash tables (databases).
+- *Security*: Storing passwords (we store the hash, not the actual password, for safety).
+- *Integrity*: Verifying files haven't been tampered with (checksums).
+- *Digital Signatures*: Authenticating messages and downloads.
+
+Hence, as you strictly guessed, we are going to use a hashing algorithm to take a digital "fingerprint" of each song in the database. Later, we perform a search algorithm to match those fingerprints against a user's sample.
+
+* Details
+Writing an algorithm that could find a song by a noisy snippet was a massive challenge. The biggest problem in the early 2000s was *scalability*—making it fast enough to search through the ~2 million songs in the Shazam database at that time.
+
+So, what was the idea?
+
+Pretty trivial to be honest. When I delved into it, I expected it to be far more complicated.
+
+First, the system converts a song into a *spectrogram* (a time/frequency/amplitude graph). Then, it splits this spectrogram into blocks and selects the strongest "peaks" (points of high energy) from each block if the magnitude exceeds a certain threshold.
+
+This collection of peaks creates what we call a *Constellation Map*, and this is where the hashing algorithm kicks in.
+
+The algorithm forms pairs of points to create a unique identifier:
+
+1. *Anchor Point*: The algorithm picks a strong peak in the constellation map to act as an "anchor."
+2. *Target Zone*: It defines a small window (box) of time and frequency relative to that anchor.
+3. *Coupling*: It pairs every peak found inside the Target Zone with the anchor peak.
+
+For every pair, the algorithm generates a numeric hash. This is typically a 32-bit integer that encodes 3 pieces of crucial information:
+
+$$\text{Hash } = \langle f_1, f_2, \triangle t \rangle$$
+
+- $f_1$: The frequency of the *Anchor* point.
+- $f_2$: The frequency of the *Target* point.
+- $\triangle t$: The time difference between the Anchor and Target points.
+
+By combining two frequencies and their relative time distance, the hash becomes highly unique (high entropy). This creates a "fingerprint" that is *independent of absolute time*. The algorithm doesn't care *when* in the song the notes happened; it only cares that "frequency A was followed by frequency B exactly $X$ milliseconds later."
+
+* Conclusion
+So, as you can see, the combinatorial hashing algorithm is not something out of this world. It is actually quite elegant to come up with and reasonably simple to implement in code.
+
+Hope this explains how Shazam on your iPhone finds the tracks you like in mere milliseconds.

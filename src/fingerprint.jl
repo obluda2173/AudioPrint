@@ -4,15 +4,10 @@ export find_peaks, hash_peaks
 
 using Statistics
 
-"""
-find_peaks(spectrogram::Matrix{Float64}; amp_min=10.0, neighbor_size=10)
+function find_peaks(spectrogram::Matrix{Float64},
+                    amp_min::Float64=10.0,
+                    neighbor_size::Int=10)
 
-Finds local maxima in a spectrogram.
-- `spectrogram`: 2D array (Frequency x Time).
-- `amp_min`: Minimum amplitude to be considered a peak (filters silence).
-- `neighbor_size`: The radius of the neighborhood to check.
-"""
-function find_peaks(spectrogram::Matrix{Float64}, amp_min::Float64=10.0, neighbor_size::Int=10)
     rows, cols = size(spectrogram)
     peaks = Vector{Tuple{Int, Int}}()
 
