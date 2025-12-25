@@ -5,7 +5,7 @@ using FFMPEG
 using WAV
 using Statistics: mean
 
-export mp3_to_wav, compute_log_spectrogram
+export mp3_to_wav, compute_spectrogram_obj
 
 """
 Converts an MP3 file to WAV format using FFMPEG.
@@ -22,23 +22,15 @@ end
 Loads a WAV file, converts to mono, computes the spectrogram,
 and returns the Power Spectral Density in Decibels (dB).
 """
-function compute_log_spectrogram(file_path::String; window_duration::Float64=0.04)
-    # 1. Load Audio (raw_audio is a Matrix: samples x channels)
+function compute_spectrogram_obj(file_path::String; window_duration::Float64=0.04)
     raw_audio, fs = wavread(file_path)
-
-    # 2. Convert to Mono (Efficiently)
-    # If stereo (2 columns), average them. If already mono, just flatten to vector.
     signal = size(raw_audio, 2) > 1 ? vec(mean(raw_audio, dims=2)) : vec(raw_audio)
 
-    # 3. Configure Windows (Time -> Samples)
     n_window = round(Int, window_duration * fs)
     n_overlap = n_window ÷ 2
 
-    # 4. Compute Spectrogram (DSP.jl)
-    spec = spectrogram(signal, n_window, n_overlap; fs=fs)
-
-    # 5. Convert Power to dB (Log Scale) and return
-    return pow2db.(spec.power)
+    # Return the struct! It contains .power, .freq, and .time
+    return spectrogram(signal, n_window, n_overlap; fs=fs)
 end
 
 end

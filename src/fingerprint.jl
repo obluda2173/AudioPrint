@@ -1,20 +1,57 @@
 module Fingerprint
 
-export find_peaks, hash_peaks
+export find_peaks_adaptive, hash_peaks
 
+using DSP
 using Statistics
 
-function find_peaks(spectrogram::Matrix{Float64},
-                    amp_min::Float64 = -50.0,
-                    neighbor_size::Int=10)
+"""
+Identifies peaks using adaptive, human-readable constraints.
+- `dynamic_range_db`: How far down from the loudness peak to look (e.g. 30dB).
+- `min_dist_freq`: Minimum distance between peaks in Hz.
+- `min_dist_time`: Minimum distance between peaks in Seconds.
+"""
+function find_peaks_adaptive(spec_obj;
+                             dynamic_range_db::Float64 = 40.0,
+                             min_dist_freq::Float64 = 150.0, # e.g., 150 Hz gap
+                             min_dist_time::Float64 = 0.5)   # e.g., 0.5 Seconds gap
 
-    rows, cols = size(spectrogram)
+    # 1. Convert Power to dB
+    # We do this here so we can find the relative Max
+    power_db = pow2db.(spec_obj.power)
+
+    # 2. Calculate Adaptive Amplitude Threshold
+    # Instead of hardcoded -50, we look X dB below the song's loudest point.
+    # This works for both whisper-quiet recordings and loud rock songs.
+    max_volume = maximum(power_db)
+    amp_min = max_volume - dynamic_range_db
+
+    # 3. Calculate Adaptive Neighborhood (Physical Units -> Matrix Bins)
+    # We figure out how "wide" one pixel is in Hz and Seconds.
+
+    # Hz per bin = (Total Freq Range) / (Total Freq Bins)
+    # Check the difference between the first two frequency steps
+    hz_step = spec_obj.freq[2] - spec_obj.freq[1]
+
+    # Seconds per bin
+    time_step = spec_obj.time[2] - spec_obj.time[1]
+
+    # Convert user's physical constraints into matrix integers
+    # e.g. "I want 150Hz gap" / "43Hz per bin" = 3 bins
+    r_neighbor = max(1, round(Int, min_dist_freq / hz_step))
+    c_neighbor = max(1, round(Int, min_dist_time / time_step))
+
+    println("Adaptive Config: Threshold: $(amp_min)dB | Neighbors: $(r_neighbor)x$(c_neighbor) bins")
+
+    # 4. Standard Peak Finding Loop (using calculated integers)
+    rows, cols = size(power_db)
     peaks = Vector{Tuple{Int, Int}}()
 
-    for c in (1 + neighbor_size):(cols - neighbor_size)
-        for r in (1 + neighbor_size):(rows - neighbor_size)
+    # Loop with safety margins for the window
+    for c in (1 + c_neighbor):(cols - c_neighbor)
+        for r in (1 + r_neighbor):(rows - r_neighbor)
 
-            cur_val = spectrogram[r, c]
+            cur_val = power_db[r, c]
 
             if cur_val < amp_min
                 continue
@@ -22,15 +59,12 @@ function find_peaks(spectrogram::Matrix{Float64},
 
             is_peak = true
 
-            for c_off in -neighbor_size:neighbor_size
-                for r_off in -neighbor_size:neighbor_size
+            # Check neighbors
+            for c_off in -c_neighbor:c_neighbor
+                for r_off in -r_neighbor:r_neighbor
+                    if c_off == 0 && r_off == 0 continue end
 
-                    if c_off == 0 && r_off == 0
-                        continue
-                    end
-
-                    # FIX 2: Correct variable name (cur_val) and indexing
-                    if spectrogram[r + r_off, c + c_off] >= cur_val
+                    if power_db[r + r_off, c + c_off] >= cur_val
                         is_peak = false
                         break
                     end
