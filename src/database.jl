@@ -1,3 +1,7 @@
+module Database
+
+export init_db, add_songs, add_fingerprint, query_fingerprints
+
 using SQLite
 using DataFrames
 
@@ -28,11 +32,12 @@ function add_songs()
 
 end
 
-
 function add_fingerprint()
 
 end
 
 function query_fingerprints()
+
+end
 
 end
