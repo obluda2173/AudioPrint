@@ -5,7 +5,7 @@ export find_peaks, hash_peaks
 using Statistics
 
 function find_peaks(spectrogram::Matrix{Float64},
-                    amp_min::Float64=10.0,
+                    amp_min::Float64 = -50.0,
                     neighbor_size::Int=10)
 
     rows, cols = size(spectrogram)
@@ -14,7 +14,7 @@ function find_peaks(spectrogram::Matrix{Float64},
     for c in (1 + neighbor_size):(cols - neighbor_size)
         for r in (1 + neighbor_size):(rows - neighbor_size)
 
-            cur_val = spectrogram[r][c]
+            cur_val = spectrogram[r, c]
 
             if cur_val < amp_min
                 continue
@@ -29,7 +29,8 @@ function find_peaks(spectrogram::Matrix{Float64},
                         continue
                     end
 
-                    if spectrogram[r + r_off, c + c_off] >= current_val
+                    # FIX 2: Correct variable name (cur_val) and indexing
+                    if spectrogram[r + r_off, c + c_off] >= cur_val
                         is_peak = false
                         break
                     end

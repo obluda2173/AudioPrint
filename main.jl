@@ -1,19 +1,23 @@
 include("src/fingerprint.jl")
+include("src/dsp.jl")
 
 using .Fingerprint
+using .Dsp
 
-constellation_map = [
-    (10, 50),
-    (12, 60),
-    (15, 55),
-    (500, 120)
-]
+const SONG_PATH = "./data/fma_small_local/000/000002.wav"
 
 function main()
-    results = hash_peaks(constellation_map)
+    spec = spectrogram_cstm(SONG_PATH)
+    println("Spectrogram created: ", length(spec))
+    peaks = find_peaks(spec)
+    println("Peaks found: ", length(peaks))
+    results = hash_peaks(peaks)
+    println("Hashes generated: ", length(results))
 
-    for res in results
-        println("Hash: $(bitstring(res.hash)) | Anchor Time: $(res.time_offset)")
+    open("hash.txt", "w") do io
+        for res in results
+            write(io, "Hash: $(bitstring(res.hash)) | Anchor Time: $(res.time_offset)\n")
+        end
     end
 end
 

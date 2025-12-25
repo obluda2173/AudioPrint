@@ -1,4 +1,12 @@
-using FFMPEG, DSP, WAV, Plots
+module Dsp
+
+export mp3_to_wav, spectrogram_cstm
+
+using DSP
+using FFMPEG
+using Plots
+using SampledSignals
+using WAV
 
 function mp3_to_wav(input_path)
     output_path = replace(input_path, ".mp3" => ".wav")
@@ -6,19 +14,38 @@ function mp3_to_wav(input_path)
     println("Saved as: $output_path")
 end
 
+function spectrogram_cstm(file_path)
+    raw_audio, fs = wavread(file_path)
 
-# using WAV
-# s, fs = wavread("/mnt/c/Dev/AudioPrint/data/fma_small_local/000/000002.wav")
-# print(fs)
-# plot(0:2/fs:(length(s)-1)/fs, s)
-# xlabel("Time [s]")
+    audio_buf = SampleBuf(raw_audio, fs)
+    mono_signal = vec(mono(audio_buf).data)
 
-using SampledSignals, WAV
-audio_test_url = "https://upload.wikimedia.org/wikipedia/commons/4/48/Piano-phrase.wav"
- y, fs = wavread("../data/fma_small_local/000/000002.wav")
-audio_test = SampleBuf(y,fs)
-n = length(audio_test.data)
-nw = n÷50
-spec = spectrogram(vec(mono(audio_test).data), nw, nw÷10; fs=fs)
-plt = heatmap(spec.time, spec.freq, pow2db.(spec.power), xguide="Time [s]", yguide="Frequency [Hz]")
-savefig("../media/heatmap.png")
+    n_samples = length(mono_signal)
+    window_duration = 0.04
+    window_size = round(Int, window_duration * fs)
+    overlap = window_size ÷ 2
+
+    spec = spectrogram(mono_signal, window_size, overlap; fs=fs)
+
+    println(typeof(spec))
+
+    power_db = pow2db.(spec.power)
+
+    return power_db
+
+    # heatmap(
+    #     spec.time,
+    #     spec.freq,
+    #     power_db,
+    #     xguide = "Time [s]",
+    #     yguide = "Frequency [Hz]",
+    #     title = "Spectrogram Analysis",
+    #     color = :viridis
+    # )
+
+    # savefig("../media/heatmap.png")
+end
+
+# spectrogram_plot("../data/fma_small_local/000/000002.wav")
+
+end
