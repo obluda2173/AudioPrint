@@ -2,7 +2,7 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-25>
-#+lastmod: <2025-12-25 15:24>
+#+lastmod: <2025-12-25 15:56>
 #+options: num:t
 #+startup: overview
 
@@ -14,9 +14,15 @@ For a role of a SQL database engine, we chose SQLite. Tha main reason for this i
 * Thoughts
 To create two tables, with one table being about the songs (e.g. containing song id, name, and artist), while other table would be focused on the fingerprint and song realtion (e.g. hash, song_id, offset).
 
-* Phase 1: The Schema
+* Phase 1: The Schema (The Foundation)
 We need a relational structure. A "Fingerprint" belongs to a "Song".
 
 *Goal*: Create two tables:
 - =Songs=: Stores metadata.
 - =Fingerprints=: Stores acoustic hashes and crucially, when they happen in the song.
+
+* Phase 2: Indexing (The Performance Making)
+Crucial part!
+
+*Goal*: Ensure lookups happen in miliseconds, not seconds.
+*Strategy*: We will constantly query the =Fingerprints= table with =WHERE hash = ?=. If we don't index the hash column, SQLite has to scan every single row for every single match.
