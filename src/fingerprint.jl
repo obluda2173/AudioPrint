@@ -1,5 +1,7 @@
 module Fingerprint
 
+export find_peaks, hash_peaks
+
 using Statistics
 
 """
@@ -57,7 +59,7 @@ function hash_peaks(peaks::Vector{Tuple{Int, Int}},   # basically peaks
     sorted_peaks = sort(peaks, by = x -> x[1])
 
     n_peaks = length(sorted_peaks)
-    hashes = Vector{NamedTuple{(:hash, :time_offset), Tuple{UInt32, Int}}}
+    hashes = Vector{NamedTuple{(:hash, :time_offset), Tuple{UInt32, Int}}}()
 
     sizehint!(hashes, n_peaks * fan_out)
 
