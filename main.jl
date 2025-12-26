@@ -26,24 +26,18 @@ function main()
     song_id = Listen.identify_song(db, hashes)
 
     println("-" ^ 40)
+    song_info = Database.get_song(db, song_id)
 
-    if isnothing(song_id)
-        # Failure: Red
-        printstyled("❌ No match found.\n", color=:red, bold=true)
-    else
-        song_info = Database.get_song(db, song_id)
+    printstyled("✅ Match Found!\n\n", color=:green, bold=true)
 
-        printstyled("✅ Match Found!\n\n", color=:green, bold=true)
+    printstyled("Title:  ", color=:yellow, bold=true)
+    println(song_info.title)
 
-        printstyled("Title:  ", color=:yellow, bold=true)
-        println(song_info.title)
+    printstyled("Artist: ", color=:yellow, bold=true)
+    println(song_info.artist)
 
-        printstyled("Artist: ", color=:yellow, bold=true)
-        println(song_info.artist)
-
-        printstyled("Album:  ", color=:yellow, bold=true)
-        println(song_info.album)
-    end
+    printstyled("Album:  ", color=:yellow, bold=true)
+    println(song_info.album)
     println("-" ^ 40)
 end
 
