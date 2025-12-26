@@ -4,7 +4,6 @@ include("../src/fingerprint.jl")
 
 using FFMPEG
 using JSON
-
 using .Dsp
 using .Database
 using .Fingerprint

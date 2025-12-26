@@ -1,42 +1,44 @@
 include("src/dsp.jl")
 include("src/database.jl")
 include("src/fingerprint.jl")
+include("scripts/listen.jl")
 
 using SQLite
-
 using .Dsp
 using .Database
 using .Fingerprint
+using .Listen
 
-# const SONG_PATH = "./samples/night_owl.wav"
-# const SONG_PATH = "./samples/hallon.wav"
-const SONG_PATH = "./samples/outside_to_play.wav"
+const SONG_PATH = "./audio_samples/night_owl.wav"
+# const SONG_PATH = "./audio_samples/hallon.wav"
+# const SONG_PATH = "./audio_samples/outside_to_play.wav"
 # const SONG_PATH = "./data/fma_small_local/013/013191.wav"
-
-function get_song(db::SQLite.DB, song_id::Int)
-    stmt = SQLite.Stmt(db, "SELECT * FROM Songs WHERE song_id = ?")
-
-    results = DBInterface.execute(stmt, [song_id])
-
-    for row in results
-        println("Found: '$(row.title)' by $(row.artist) (Album: $(row.album))")
-        return row
-    end
-
-    println("No song found with ID: $song_id")
-    return nothing
-end
 
 function main()
     db = SQLite.DB("./db/songs.db")
 
+    printstyled("\nProcessing audio...\n", color=:cyan)
     spec_matrix = compute_spectrogram_obj(SONG_PATH)
     peaks = find_peaks_adaptive(spec_matrix)
-    results = hash_peaks(peaks)
+    hashes = hash_peaks(peaks)
 
-    song_id = query_fingerprints(db, results)
+    printstyled("Searching database...\n", color=:cyan)
+    song_id = Listen.identify_song(db, hashes)
 
-    get_song(db, song_id)
+    println("-" ^ 40)
+    song_info = Database.get_song(db, song_id)
+
+    printstyled("✅ Match Found!\n\n", color=:green, bold=true)
+
+    printstyled("Title:  ", color=:yellow, bold=true)
+    println(song_info.title)
+
+    printstyled("Artist: ", color=:yellow, bold=true)
+    println(song_info.artist)
+
+    printstyled("Album:  ", color=:yellow, bold=true)
+    println(song_info.album)
+    println("-" ^ 40)
 end
 
 main()
