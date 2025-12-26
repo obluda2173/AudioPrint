@@ -65,12 +65,15 @@ function add_fingerprint(db::SQLite.DB,
     end
 end
 
-# searches for matches
-# returns a DataFrame
-# instructions: good luck
-# function query_fingerprints(db::SQLite.DB,
-#                             query_hashes::Vector{Int})
 
-# end
+ function query_fingerprints(db::SQLite.DB,
+                           query_hashes::Vector{Int})
+using SQLite, DBInterface, DataFrames
 
+function query_fingerprints(db::SQLite.DB, query_hashes::Vector{Int})
+    placeholders = join(fill("?", length(query_hashes)), ", ")
+    sql = "SELECT song_id, hash, offset FROM Fingerprints WHERE hash IN ($placeholders)"
+    result = DBInterface.execute(db, sql, query_hashes)
+    
+    return DataFrame(result)
 end
