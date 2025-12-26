@@ -40,8 +40,13 @@ function add_song(db::SQLite.DB,
                   title::String,
                   artist::String,
                   album::String)
-
-
+       stmt = SQLite.Stmt(db, """
+       INSERT INTO Song
+       Values(?,?,?);
+       """)
+       DBInterface.execute(stmt,[title,artist,album])
+       song_id = DBInterface.lastrowid(db)
+       return song_id
 end
 
 # bulk insert hashes
@@ -50,9 +55,17 @@ end
 function add_fingerprints(db::SQLite.DB,
                           song_id::Int,
                           hashes::Vector{Tuple{Int, Int}})
-
+       stmt = SQLite.Stmt(db, """
+       INSERT INTO Fingerprints
+       Values(?,?,?);
+       """)
+       DBInterface.transaction(db) do
+            for (hash_val, offset_val) in hashes
+                  params = [song_id, hash_val, offset_val]
+            DBInterface.execute(stmt, params)
+        end
+    end
 end
-
 # searches for matches
 # returns a DataFrame
 # instructions: good luck
