@@ -32,6 +32,10 @@ end
 
 # inserts metadata
 # returns song_id
+# instructions: have a look on how the above tables Songs and Fingerptints are created
+#               check the difference between SQLite's execute() and Stmt() method functions
+#               use most appropriate function to insert the given signature arguments to a database
+#               do some little research on how to create appopriate song_id
 function add_song(db::SQLite.DB,
                   title::String,
                   artist::String,
@@ -42,6 +46,7 @@ end
 
 # bulk insert hashes
 # accepts a Vector of Tuples: [(hash1, offset1), (hash2, offset2), ...]
+# instructions: get some inspiration from previous instructions
 function add_fingerprints(db::SQLite.DB,
                           song_id::Int,
                           hashes::Vector{Tuple{Int, Int}})
@@ -50,6 +55,7 @@ end
 
 # searches for matches
 # returns a DataFrame
+# instructions: good luck
 function query_fingerprints(db::SQLite.DB,
                             query_hashes::Vector{Int})
 
