@@ -9,8 +9,8 @@ using .Database
 using .Fingerprint
 using .Listen
 
-const SONG_PATH = "./audio_samples/night_owl.wav"
-# const SONG_PATH = "./audio_samples/hallon.wav"
+# const SONG_PATH = "./audio_samples/night_owl.wav"
+const SONG_PATH = "./audio_samples/hallon.wav"
 # const SONG_PATH = "./audio_samples/outside_to_play.wav"
 # const SONG_PATH = "./data/fma_small_local/013/013191.wav"
 
