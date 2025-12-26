@@ -45,13 +45,13 @@ function main()
 
         # 1. ingest metadata
         tags = get_wav_tags(file_path)
-        song_id = add_songs(db,
+        song_id = add_song(db,
                   get(tags, "title", "unknown"),
                   get(tags, "artist", "unknown"),
                   get(tags, "album", "unknown"))
 
         # 2. ingest fingerprint
-        spec_matrix = compute_spectrogram_obj(SONG_PATH)
+        spec_matrix = compute_spectrogram_obj(file_path)
         peaks = find_peaks_adaptive(spec_matrix)
         hashes = hash_peaks(peaks)
         add_fingerprint(db,
