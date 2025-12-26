@@ -1,5 +1,3 @@
-# will feed all songs files to a database
-
 include("../src/dsp.jl")
 include("../src/database.jl")
 include("../src/fingerprint.jl")
@@ -33,7 +31,7 @@ function get_wav_tags(file_path::String)
     return Dict()
 end
 
-function ingest_library()
+function main()
     file_list = readdir(MUSIC_FOLDER)
 
     db = init_db(DB_PATH)
@@ -45,14 +43,14 @@ function ingest_library()
 
         file_path = joinpath(MUSIC_FOLDER, file)
 
-        # 1. ingest metadata (id, title, author, album)
+        # 1. ingest metadata
         tags = get_wav_tags(file_path)
         song_id = add_songs(db,
                   get(tags, "title", "unknown"),
                   get(tags, "artist", "unknown"),
                   get(tags, "album", "unknown"))
 
-        # 2. ingest fingerprint ( )
+        # 2. ingest fingerprint
         spec_matrix = compute_spectrogram_obj(SONG_PATH)
         peaks = find_peaks_adaptive(spec_matrix)
         hashes = hash_peaks(peaks)
@@ -62,4 +60,4 @@ function ingest_library()
     end
 end
 
-ingest_library()
+main()
