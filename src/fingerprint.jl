@@ -41,8 +41,6 @@ function find_peaks_adaptive(spec_obj;
     r_neighbor = max(1, round(Int, min_dist_freq / hz_step))
     c_neighbor = max(1, round(Int, min_dist_time / time_step))
 
-    println("Adaptive Config: Threshold: $(amp_min)dB | Neighbors: $(r_neighbor)x$(c_neighbor) bins")
-
     # 4. Standard Peak Finding Loop (using calculated integers)
     rows, cols = size(power_db)
     peaks = Vector{Tuple{Int, Int}}()
@@ -73,7 +71,7 @@ function find_peaks_adaptive(spec_obj;
             end
 
             if is_peak
-                push!(peaks, (r, c))
+                push!(peaks, (c, r))
             end
         end
     end

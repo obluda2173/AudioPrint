@@ -8,14 +8,6 @@ using DBInterface # Good practice to explicitly use this for the interface funct
 function init_db(db_path)
     db = SQLite.DB(db_path)
 
-
-    SQLite.execute(db, """
-    DROP TABLE IF EXISTS Songs;
-    """)
-    SQLite.execute(db, """
-    DROP TABLE IF EXISTS Fingerprints;
-    """)
-
     # Table creation looks good
     SQLite.execute(db, """
     CREATE TABLE IF NOT EXISTS Songs (
