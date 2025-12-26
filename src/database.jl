@@ -3,13 +3,12 @@ module Database
 export init_db, add_song, add_fingerprint, query_fingerprints
 
 using DataFrames
+using DBInterface
 using SQLite
-using DBInterface # Good practice to explicitly use this for the interface functions
 
 function init_db(db_path)
     db = SQLite.DB(db_path)
 
-    # Table creation looks good
     SQLite.execute(db, """
     CREATE TABLE IF NOT EXISTS Songs (
         song_id INTEGER PRIMARY KEY,

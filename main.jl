@@ -1,17 +1,17 @@
-include("src/fingerprint.jl")
 include("src/dsp.jl")
 include("src/database.jl")
+include("src/fingerprint.jl")
 
 using SQLite
 
-using .Fingerprint
 using .Dsp
 using .Database
+using .Fingerprint
 
 # const SONG_PATH = "./samples/night_owl.wav"
 # const SONG_PATH = "./samples/hallon.wav"
-# const SONG_PATH = "./samples/outside_to_play.wav"
-const SONG_PATH = "./data/fma_small_local/013/013191.wav"
+const SONG_PATH = "./samples/outside_to_play.wav"
+# const SONG_PATH = "./data/fma_small_local/013/013191.wav"
 
 function get_song(db::SQLite.DB, song_id::Int)
     stmt = SQLite.Stmt(db, "SELECT * FROM Songs WHERE song_id = ?")
@@ -34,12 +34,9 @@ function main()
     peaks = find_peaks_adaptive(spec_matrix)
     results = hash_peaks(peaks)
 
-    song_ids = query_fingerprints(db, results)
+    song_id = query_fingerprints(db, results)
 
-    # println(song_id)
-
-    get_song(db, song_ids[1])
-    # get_song(db, song_ids[2])
+    get_song(db, song_id)
 end
 
 main()
