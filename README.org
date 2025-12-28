@@ -1,0 +1,39 @@
+#+title: AudioPrint
+#+author: Erik An
+#+email: obluda2173@gmail.com
+#+date: <2025-12-28>
+#+lastmod: <2025-12-28 18:47>
+#+options: num:t
+#+startup: overview
+
+* AudioPrint
+A Julia-based audio fingerprinting system (inspired by Shazam). It listens to audio snippets and identifies them against a local database.
+
+* Getting Started
+Since audio files are too large for git, this repository contains the engine. You will need to provide your own audio files to build the library.
+
+I would suggest [[https://github.com/mdeff/fma][Free Music Archive]], but you would have to convert all =.mp3= files to =.wav= due to the Julia's incompatability with =MP3=.
+
+* Build Your Database
+Place your .wav files in a folder (e.g., data/my_music), then run the ingestion script. (Note: Ensure you update the path in ingest_library.jl or pass it as an arg).
+
+#+begin_src bash
+julia scripts/ingest_library.jl
+#+end_src
+
+This creates =db/songs.db=.
+
+* Identify a Song
+To identify a song (or a noisy snippet of one), run:
+
+#+begin_src bash
+julia scripts/main.jl path/to/snippet.wav
+#+end_src
+
+* More Theory
+More theory can be found in file:./docs/notes.
+
+* Benchmarks
+The =scripts/validate.jl= script is used to measure accuracy.
+- Accuracy: 97.8% (tested on 138 clips with background noise)
+- Dataset: FMA Small (Local version)
