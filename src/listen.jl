@@ -2,7 +2,7 @@ module Listen
 
 export identify_song
 
-include("../src/database.jl")
+include("database.jl")
 
 using .Database
 

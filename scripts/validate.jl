@@ -1,16 +1,21 @@
-include("../src/dsp.jl")
-include("../src/database.jl")
-include("../src/fingerprint.jl")
-include("./listen.jl")
+using DrWatson
+@quickactivate "AudioFingerprint"
+
+include(srcdir("dsp.jl"))
+include(srcdir("database.jl"))
+include(srcdir("fingerprint.jl"))
+include(srcdir("listen.jl"))
 
 using SQLite
 using FFMPEG
 using JSON
-
 using .Dsp
 using .Database
 using .Fingerprint
 using .Listen
+
+const DB_PATH = projectdir("data/db", "songs.db")
+const SAMPLES_PATH = datadir("processed")
 
 function get_wav_tags(file_path::String)
     cmd = `$(FFMPEG.ffprobe()) -v quiet -print_format json -show_format "$file_path"`
@@ -38,16 +43,15 @@ function get_wav_tags(file_path::String)
 end
 
 function main()
-    db = SQLite.DB("../data/db/songs.db")
-    folder_path = "../data/processed/"
+    db = SQLite.DB(DB_PATH)
 
-    if !isdir(folder_path)
-        println("Directory not found: $folder_path")
+    if !isdir(SAMPLES_PATH)
+        println("Directory not found: $SAMPLES_PATH")
         return
     end
 
-    files = readdir(folder_path)
-    test_files = [joinpath(folder_path, f) for f in files if endswith(f, ".wav")]
+    files = readdir(SAMPLES_PATH)
+    test_files = [joinpath(SAMPLES_PATH, f) for f in files if endswith(f, ".wav")]
 
     total_files = length(test_files)
     correct_matches = 0
@@ -69,7 +73,6 @@ function main()
         match_success = false
         if !isnothing(found_id)
             found_info = Database.get_song(db, found_id)
-            # Case-insensitive comparison
             if lowercase(strip(found_info.title)) == lowercase(strip(truth_title))
                 match_success = true
             end

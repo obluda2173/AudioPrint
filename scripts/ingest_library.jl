@@ -1,6 +1,9 @@
-include("../src/dsp.jl")
-include("../src/database.jl")
-include("../src/fingerprint.jl")
+using DrWatson
+@quickactivate "AudioFingerprint"
+
+include(srcdir("dsp.jl"))
+include(srcdir("database.jl"))
+include(srcdir("fingerprint.jl"))
 
 using FFMPEG
 using JSON
@@ -8,8 +11,8 @@ using .Dsp
 using .Database
 using .Fingerprint
 
-const DB_PATH = "../db/songs.db"
-const MUSIC_FOLDER = "../data/fma_small_local/"
+const DB_PATH = projectdir("db", "songs.db")
+const MUSIC_FOLDER = datadir("fma_small")
 
 function get_wav_tags(file_path::String)
     cmd = `$(FFMPEG.ffprobe()) -v quiet -print_format json -show_format "$file_path"`

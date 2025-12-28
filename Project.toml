@@ -1,3 +1,5 @@
+name = "AudioFingerprint"
+
 [deps]
 DBInterface = "a10d1c49-ce27-4219-8d33-6db1a4562965"
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
