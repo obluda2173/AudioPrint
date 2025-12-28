@@ -2,38 +2,74 @@
 #+author: Erik An
 #+email: obluda2173@gmail.com
 #+date: <2025-12-28>
-#+lastmod: <2025-12-28 18:48>
+#+lastmod: <2025-12-28 18:58>
 #+options: num:t
 #+startup: overview
 
-* AudioPrint
-A Julia-based audio fingerprinting system (inspired by Shazam). It listens to audio snippets and identifies them against a local database.
+* Overview
+AudioPrint is a high-performance audio fingerprinting system written in Julia, inspired by the industrial algorithms used by Shazam. It is designed to robustly identify songs from short, noisy audio samples by matching spectral peaks against a local SQLite database.
+
+* Features
+- *Robust Identification:* Uses constellation mapping and combinatorial hashing to identify songs even with background noise.
+- *Pure Julia:* Leverages Julia's speed for DSP (Digital Signal Processing) operations.
+- *Persistent Storage:* Stores fingerprints in a lightweight SQLite database for fast lookups.
 
 * Getting Started
-Since audio files are too large for git, this repository contains the engine. You will need to provide your own audio files to build the library.
+** Prerequisites
+- Julia 1.6+
+- FFMPEG (installed via system package manager or strictly handled by Julia's =FFMPEG.jl=)
 
-I would suggest [[https://github.com/mdeff/fma][Free Music Archive]], but you would have to convert all =.mp3= files to =.wav= due to the Julia's incompatability with =MP3=.
-
-* Build Your Database
-Place your .wav files in a folder (e.g., data/my_music), then run the ingestion script. (Note: Ensure you update the path in ingest_library.jl or pass it as an arg).
-
-#+begin_src bash
-julia scripts/ingest_library.jl
-#+end_src
-
-This creates =db/songs.db=.
-
-* Identify a Song
-To identify a song (or a noisy snippet of one), run:
+** Installation
+This repository contains the engine, but not the heavy audio files. Clone the repo and instantiate the environment to download dependencies (SQLite, DSP, etc.).
 
 #+begin_src bash
-julia scripts/main.jl path/to/snippet.wav
+git clone https://github.com/your-username/AudioPrint.jl
+cd AudioPrint.jl
+julia --project=. -e 'using Pkg; Pkg.instantiate()'
 #+end_src
 
-* More Theory
-More theory can be found in [[file:./docs/notes][notes]].
+* Data Preparation (Important!)
+Since you need to build your own library, you must provide a collection of audio files.
+
+** 1. Get Music
+I recommend the [[https://github.com/mdeff/fma][Free Music Archive (FMA)]] dataset (specifically the "Small" subset) for testing.
+
+** 2. Convert to WAV
+Currently, the ingestion engine strictly supports =.wav= files (due to native library support). If your dataset is in MP3, you must convert it.
+
+*Tip:* You can batch convert a folder of MP3s to WAV using ffmpeg in your terminal:
+#+begin_src bash
+for i in *.mp3; do ffmpeg -i "$i" -ac 1 -ar 44100 "${i%.*}.wav"; done
+#+end_src
+
+* Usage
+** 1. Build the Database (Ingestion)
+Place your =.wav= files in a data folder (e.g., =data/my_music=). Run the ingestion script to generate fingerprints and populate =db/songs.db=.
+
+#+begin_src bash
+# Usage: julia scripts/ingest_library.jl <path_to_music_folder>
+julia --project=. scripts/ingest_library.jl "data/my_music"
+#+end_src
+
+*NOTE:* you would have to modify the paths in =./scripts/= based on the path of your data folder.
+
+** 2. Identify a Song
+To identify a song—or a noisy recording of one—pass the path of the sample to the main script.
+
+#+begin_src bash
+# Usage: julia scripts/main.jl <path_to_unknown_snippet>
+julia --project=. scripts/main.jl "data/processed/mystery_snippet.wav"
+#+end_src
 
 * Benchmarks
-The =scripts/validate.jl= script is used to measure accuracy.
-- Accuracy: 97.8% (tested on 138 clips with background noise)
-- Dataset: FMA Small (Local version)
+The system includes a validation suite (=scripts/validate.jl=) that tests the algorithm against distorted/noisy samples.
+
+| Metric        | Result                            |
+|---------------+-----------------------------------|
+| *Accuracy*    | *97.8%*                           |
+| *Avg Time*    | *260 ms*                          |
+| *Dataset*     | FMA Small (Local Subset)          |
+| *Sample Size* | 138 clips (with background noise) |
+
+* Theory & Documentation
+For a deeper dive into the signal processing logic (Spectrograms, Peak Finding, Hashing), please refer to the [[file:docs/notes][internal notes]].

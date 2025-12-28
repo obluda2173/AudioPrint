@@ -7,6 +7,7 @@ include(srcdir("fingerprint.jl"))
 include(srcdir("listen.jl"))
 
 using SQLite
+using Statistics
 using FFMPEG
 using JSON
 using .Dsp
@@ -43,6 +44,12 @@ function get_wav_tags(file_path::String)
 end
 
 function main()
+    # Ensure DB exists
+    if !isfile(DB_PATH)
+        println("Error: Database not found at $DB_PATH")
+        return
+    end
+
     db = SQLite.DB(DB_PATH)
 
     if !isdir(SAMPLES_PATH)
@@ -55,6 +62,7 @@ function main()
 
     total_files = length(test_files)
     correct_matches = 0
+    processing_times = Float64[]
 
     println("Running batch validation on $total_files files...")
     println("-" ^ 40)
@@ -65,10 +73,14 @@ function main()
         truth_tags = get_wav_tags(file_path)
         truth_title = get(truth_tags, "title", "Unknown Title")
 
-        spec = compute_spectrogram_obj(file_path)
-        peaks = find_peaks_adaptive(spec)
-        hashes = hash_peaks(peaks)
-        found_id = Listen.identify_song(db, hashes)
+        t_elapsed = @elapsed begin
+            spec = compute_spectrogram_obj(file_path)
+            peaks = find_peaks_adaptive(spec)
+            hashes = hash_peaks(peaks)
+            found_id = Listen.identify_song(db, hashes)
+        end
+        push!(processing_times, t_elapsed)
+        # --- END TIMER ---
 
         match_success = false
         if !isnothing(found_id)
@@ -80,18 +92,22 @@ function main()
 
         if match_success
             correct_matches += 1
-            printstyled("✔ [PASS] $filename\n", color=:green)
+            printstyled("✔ [PASS] $filename ", color=:green)
         else
-            printstyled("✘ [FAIL] $filename (Expected: $truth_title)\n", color=:red)
+            printstyled("✘ [FAIL] $filename (Expected: $truth_title) ", color=:red)
         end
+        printstyled("($(round(t_elapsed * 1000; digits=1))ms)\n", color=:light_black)
     end
 
     println("-" ^ 40)
-    percentage = round((correct_matches / total_files) * 100; digits=2)
+
+    accuracy = round((correct_matches / total_files) * 100; digits=2)
+    avg_time = round(mean(processing_times) * 1000; digits=2)
 
     printstyled("Total: $total_files\n", bold=true)
     printstyled("Correct: $correct_matches\n", bold=true, color=:green)
-    printstyled("Success Rate: $percentage%\n", bold=true, color=:cyan)
+    printstyled("Success Rate: $accuracy%\n", bold=true, color=:cyan)
+    printstyled("Avg Time: $(avg_time)ms\n", bold=true, color=:yellow)
 end
 
 main()
