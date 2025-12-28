@@ -1,5 +1,23 @@
-*local*
-.DS_Store
+# --- Julia Specific ---
+*.ji
+*.cov
+*.mem
+*.log
+Manifest.toml.bak
+
+# --- Project Data (The Big Stuff) ---
+data/
+db/
 *.db
-db
-raw
+*.sqlite
+*.wav
+*.mp3
+
+# --- System Junk ---
+.DS_Store
+.vscode/
+.idea/
+
+# --- DrWatson Defaults (If using it) ---
+_research/
+tmp/
