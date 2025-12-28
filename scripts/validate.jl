@@ -38,8 +38,8 @@ function get_wav_tags(file_path::String)
 end
 
 function main()
-    db = SQLite.DB("../db/songs.db")
-    folder_path = "../data/processed_8s_noise/"
+    db = SQLite.DB("../data/db/songs.db")
+    folder_path = "../data/processed/"
 
     if !isdir(folder_path)
         println("Directory not found: $folder_path")
