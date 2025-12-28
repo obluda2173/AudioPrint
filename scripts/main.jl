@@ -1,7 +1,10 @@
-include("src/dsp.jl")
-include("src/database.jl")
-include("src/fingerprint.jl")
-include("scripts/listen.jl")
+using DrWatson
+@quickactivate "AudioFingerprint"
+
+include(srcdir("dsp.jl"))
+include(srcdir("database.jl"))
+include(srcdir("fingerprint.jl"))
+include(srcdir("listen.jl"))
 
 using SQLite
 using .Dsp
@@ -9,35 +12,50 @@ using .Database
 using .Fingerprint
 using .Listen
 
-# const SONG_PATH = "./audio_samples/night_owl.wav"
-const SONG_PATH = "./data/asa/hallon.wav"
-# const SONG_PATH = "./audio_samples/outside_to_play.wav"
-# const SONG_PATH = "./data/fma_small_local/013/013191.wav"
+const DB_PATH = datadir("db", "songs.db")
 
 function main()
-    db = SQLite.DB("./data/db/songs.db")
+    if length(ARGS) < 1
+        printstyled("Error: No audio file provided.\n", color=:red, bold=true)
+        println("Usage: julia scripts/identify.jl <path_to_audio_file>")
+        return
+    end
 
-    printstyled("\nProcessing audio...\n", color=:cyan)
-    spec_matrix = compute_spectrogram_obj(SONG_PATH)
+    target_file = ARGS[1]
+
+    if !isfile(target_file)
+        printstyled("Error: File not found: $target_file\n", color=:red)
+        return
+    end
+
+    if !isfile(DB_PATH)
+        printstyled("Error: Database not found at $DB_PATH\n", color=:red)
+        println("Please run 'scripts/ingest_library.jl' first to build your database.")
+        return
+    end
+
+    db = SQLite.DB(DB_PATH)
+
+    printstyled("\n🎧 Processing $target_file...\n", color=:cyan)
+    # ... (Keep your existing fingerprint/hash logic here) ...
+    spec_matrix = compute_spectrogram_obj(target_file)
     peaks = find_peaks_adaptive(spec_matrix)
     hashes = hash_peaks(peaks)
 
-    printstyled("Searching database...\n", color=:cyan)
+    printstyled("🔍 Searching database...\n", color=:cyan)
     song_id = Listen.identify_song(db, hashes)
 
     println("-" ^ 40)
-    song_info = Database.get_song(db, song_id)
 
-    printstyled("✅ Match Found!\n\n", color=:green, bold=true)
-
-    printstyled("Title:  ", color=:yellow, bold=true)
-    println(song_info.title)
-
-    printstyled("Artist: ", color=:yellow, bold=true)
-    println(song_info.artist)
-
-    printstyled("Album:  ", color=:yellow, bold=true)
-    println(song_info.album)
+    if isnothing(song_id)
+        printstyled("❌ No match found.\n", color=:red, bold=true)
+    else
+        song_info = Database.get_song(db, song_id)
+        printstyled("✅ Match Found!\n", color=:green, bold=true)
+        println("Title:  $(song_info.title)")
+        println("Artist: $(song_info.artist)")
+        println("Album:  $(song_info.album)")
+    end
     println("-" ^ 40)
 end
 
