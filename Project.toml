@@ -2,6 +2,7 @@
 DBInterface = "a10d1c49-ce27-4219-8d33-6db1a4562965"
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 FFMPEG = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
